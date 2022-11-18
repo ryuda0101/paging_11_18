@@ -1,12 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판 페이징 진도</title>
-</head>
-<body>
-    
-</body>
-</html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>게시판 페이징 진도</title>
+        <style>
+            * {margin:0; padding:0;}
+            ul,li,ol {list-style:none;}
+            .paging {
+                display:flex;
+            }
+            .paging li {
+                margin:0 15px;
+            }
+            .paging li.highlight a {color:red;}
+            .paging li a {color:#000;}
+        </style>
+    </head>
+    <body>
+        <!-- <a href="/boardtest?page=1">1번 페이징</a> -->
+        
+        <!-- 데이터를 보여주는 구간 -->
+        <table>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+            </tr>
+            <% for(let i = 0; i < prdData.length; i++){ %>
+            <tr>
+                <td><%- prdData[i].number %></td>
+                <td><%- prdData[i].title %></td>
+            </tr>
+            <% } %>
+        </table>
+        
+        <!-- 페이징 번호 생성된 구간 -->
+        <ul class="paging">
+            <!-- 1번 페이징에서는 '처음' 글자가 비활성화되고, 그 외의 페이징에서는 '처음' 글자가 활성화 된다. -->
+            <!-- 활성화 된 '처음' 글자를 클릭하면 1번 페이징으로 넘어간다. -->
+            <% if(pageNumber == 1){ %>
+                <li>처음</li>
+            <% } else{ %>
+                <!-- /boardtest?page=1 는 ?page=1 경로와 같다. -->
+                <li><a href="?page=1">처음</a></li>
+            <% } %>
+
+            <!-- 1번 블록(1,2,3 페이징이 있는)에서는 '이전'버튼이 비활성화 되고, 그 이외의 블록에서는 '이전'버튼이 활성화 된다. -->
+            <% if(blockStart > totalBlock){ %>
+                <!-- 이전번호를 누르면 현재 보고있는 페이징에서 이전 블록의 마지막 페이징 번호로 이동된다. -->
+                <li><a href="?page=<%- blockStart - 1 %>">이전</a></li>
+            <% } else { %>
+                <li>이전</li>
+            <% } %>
+
+            <!-- 만들어진 a태그를 누르면 해당 페이징 번호로 이동한다. -->
+            <!-- 현재 블록의 첫번째 페이징 번호부터 시작해서, 마지막 페이징까지 참일때 반복 (즉, 블록 하나당 3개의 페이징이 있다면 3번 반복된다.) -->
+            <% for(let i = blockStart; i <= blockEnd; i++) { %>
+                <% if(pageNumber == i){ %>
+                    <!-- 내가 보고있는 페이징 번호의 li 태그에만 색 변경 -->
+                    <li class="highlight"><a href="?page=<%- i %>"><%- i %></a></li>
+                    <% } else { %>
+                    <!-- 내가 보고있는 페이징 번호 이외의 li 태그들은 색 변경 없음 -->
+                    <li><a href="?page=<%- i %>"><%- i %></a></li>
+                <% } %>
+            <% } %>
+
+            <!-- 마지막 블록 에서는 '다음'버튼이 비활성화 되고, 그 이외의 블록에서는 '다음'버튼이 활성화 된다. -->
+            <!-- 전체 블록 갯수보다 작은경우에만 '다음'버튼이 활성화 된다. -->
+            <!-- 다음번호를 누르면 현재 보고있는 페이징에서 다음 블록의 첫번째 페이징 번호로 이동된다. -->
+            <% if(blockNum < totalBlock) { %>
+                <li><a href="?page=<%- blockEnd + 1 %>">다음</a></li>
+            <% } %>
+
+            <!-- 마지막 페이징에서는 '마지막' 글자가 비활성화되고, 그 외의 페이징에서는 '마지막' 글자가 활성화 된다. -->
+            <!-- 활성화 된 '마지막' 글자를 클릭하면 마지막 페이징으로 넘어간다. -->
+            <% if(pageNumber >= paging){ %>
+                <li>마지막</li>
+                <% } else { %>
+                <li><a href="?page=<%- paging %>">마지막</a></li>
+            <% } %>
+        </ul>
+    </body>
+    </html>
